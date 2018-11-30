@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Advanced Alarm</string>
+    <string name="mainmenu_newalarm">Make New Alarm</string>
+    <string name="all_settings">Settings</string>
+</resources>
