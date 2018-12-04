@@ -7,8 +7,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 public class MainActivity extends AppCompatActivity {
+    private ListView alarmList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +33,26 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_newalert:
-                Intent makeAlertIntent = new Intent(MainActivity.this, EditAlarmActivity.class);
+                Intent makeAlarmIntent = new Intent(MainActivity.this, EditAlarmActivity.class);
         }
         return true;
+    }
+
+    private void wireWidgets() {
+        alarmList = findViewById(R.id.listView_main_alarms);
+    }
+
+    private void populateViews() {
+
+    }
+
+    private void setListeners() {
+        alarmList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent editAlarmIntent = new Intent(MainActivity.this, EditAlarmActivity.class);
+                editAlarmIntent.putExtra("alarmId", id);
+            }
+        });
     }
 }
