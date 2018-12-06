@@ -11,8 +11,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
-    private ListView alarmList;
+    private ListView alarmListView;
+    public List<Alarm> alarmList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,24 +37,29 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_newalert:
                 Intent makeAlarmIntent = new Intent(MainActivity.this, EditAlarmActivity.class);
+                makeAlarmIntent.putExtra("editalarm", false);
+                startActivity(makeAlarmIntent);
         }
         return true;
     }
 
     private void wireWidgets() {
-        alarmList = findViewById(R.id.listView_main_alarms);
+        alarmListView = findViewById(R.id.listView_main_alarms);
     }
 
     private void populateViews() {
-
+        AlarmAdapter alarmListAdapter = new AlarmAdapter(this, alarmList);
+        alarmListView.setAdapter(alarmListAdapter);
     }
 
     private void setListeners() {
-        alarmList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        alarmListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent editAlarmIntent = new Intent(MainActivity.this, EditAlarmActivity.class);
+                editAlarmIntent.putExtra("editalarm", true);
                 editAlarmIntent.putExtra("alarmId", id);
+                startActivity(editAlarmIntent);
             }
         });
     }

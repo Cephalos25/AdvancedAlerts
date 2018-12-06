@@ -19,9 +19,9 @@ public class AlarmAdapter extends ArrayAdapter<Alarm> {
     private DateFormat timeFormat = DateFormat.getTimeInstance();
 
     public AlarmAdapter(@NonNull Context context, List<Alarm> objects) {
-        super(context, 0, objects);
+        super(context, R.layout.list_item, objects);
         this.data = objects;
-        this.mContext = mContext;
+        this.mContext = context;
     }
 
     @NonNull
@@ -34,10 +34,16 @@ public class AlarmAdapter extends ArrayAdapter<Alarm> {
 
         Alarm actedAlarm = data.get(position);
 
-        TextView name = listItem.findViewById(R.id.textView_listitem_main_name);
-        name.setText(actedAlarm.getName());
+        TextView nameView = listItem.findViewById(R.id.textView_listitem_main_name);
+        nameView.setText(actedAlarm.getName());
 
-        String date = dateFormat.format(actedAlarm.getEventDate());
+        String eventDate = dateFormat.format(actedAlarm.getEventDate());
+        TextView dateView = listItem.findViewById(R.id.textView_listitem_main_date);
+        dateView.setText(eventDate);
+
+        String eventTime = timeFormat.format(actedAlarm.getEventDate());
+        TextView timeView = listItem.findViewById(R.id.textView_listitem_main_time);
+        timeView.setText(eventTime);
         return listItem;
     }
 }
