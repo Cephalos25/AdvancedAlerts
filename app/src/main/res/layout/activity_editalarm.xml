@@ -7,7 +7,7 @@
     tools:context=".EditAlarmActivity">
 
     <NumberPicker
-        android:id="@+id/numberPicker_editalarm_month2"
+        android:id="@+id/numberPicker_editalarm_hour"
         android:layout_width="wrap_content"
         android:layout_height="100dp"
         android:layout_marginStart="30dp"
@@ -16,21 +16,21 @@
         app:layout_constraintTop_toBottomOf="@+id/numberPicker_editalarm_month" />
 
     <NumberPicker
-        android:id="@+id/numberPicker_editalarm_day2"
+        android:id="@+id/numberPicker_editalarm_minute"
         android:layout_width="wrap_content"
         android:layout_height="100dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@+id/numberPicker_editalarm_month2"
+        app:layout_constraintStart_toEndOf="@+id/numberPicker_editalarm_hour"
         app:layout_constraintTop_toBottomOf="@+id/numberPicker_editalarm_day" />
 
     <NumberPicker
-        android:id="@+id/numberPicker_editalarm_year2"
+        android:id="@+id/numberPicker_editalarm_daypart"
         android:layout_width="wrap_content"
         android:layout_height="100dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@+id/numberPicker_editalarm_day2"
+        app:layout_constraintStart_toEndOf="@+id/numberPicker_editalarm_minute"
         app:layout_constraintTop_toBottomOf="@+id/numberPicker_editalarm_year" />
 
     <TextView
@@ -61,8 +61,8 @@
         android:id="@+id/textView_editalarm_finish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/editalarm_finish"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -76,7 +76,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="9dp"
         app:layout_constraintStart_toEndOf="@+id/textView_editalarm_dateindicator"
-        app:layout_constraintTop_toBottomOf="@+id/textView_editalarm_cancel" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_editalarm_name" />
 
     <TextView
         android:id="@+id/textView_editalarm_dateindicator"
@@ -86,7 +86,7 @@
         android:layout_marginTop="50dp"
         android:text="@string/editalarm_dateindicator"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_editalarm_cancel" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_editalarm_name" />
 
     <NumberPicker
         android:id="@+id/numberPicker_editalarm_year"
@@ -95,7 +95,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="9dp"
         app:layout_constraintStart_toEndOf="@+id/numberPicker_editalarm_day"
-        app:layout_constraintTop_toBottomOf="@+id/textView_editalarm_finish" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_editalarm_name" />
 
     <NumberPicker
         android:id="@+id/numberPicker_editalarm_day"
@@ -104,7 +104,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="9dp"
         app:layout_constraintStart_toEndOf="@+id/numberPicker_editalarm_month"
-        app:layout_constraintTop_toBottomOf="@+id/textView_editalarm_delete" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_editalarm_name" />
 
     <TextView
         android:id="@+id/textView_editalarm_timeindicator"
@@ -130,10 +130,10 @@
         android:id="@+id/textView_editalarm_importance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="56dp"
-        android:text="Normal"
+        android:layout_marginEnd="8dp"
+        android:text="@string/editalarm_normalimportance"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView_editalarm_importanceindicator"
         app:layout_constraintTop_toBottomOf="@+id/textView_editalarm_timeindicator" />
@@ -144,34 +144,47 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:text="Short Description"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_editalarm_editdescription" />
-
-    <EditText
-        android:id="@+id/editText_editalarm_shortdescription"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Short Description"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_editalarm_shortdescription" />
 
     <Button
         android:id="@+id/button_editalarm_editdescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="Edit Description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_editalarm_importanceindicator" />
+
+    <EditText
+        android:id="@+id/editText_editalarm_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:hint="Alarm Name"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_editalarm_cancel" />
+
+    <EditText
+        android:id="@+id/editText_editalarm_shortdescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Short Description"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_editalarm_shortdescription" />
 
 </android.support.constraint.ConstraintLayout>

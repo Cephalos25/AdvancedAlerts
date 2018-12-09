@@ -1,6 +1,8 @@
 package com.example.advancedalarm;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -11,11 +13,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-public class MainActivity extends AppCompatActivity {
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
+public class AlarmViewActivity extends AppCompatActivity {
     private ListView alarmListView;
-    public List<Alarm> alarmList;
+
+    private Gson gson = new Gson();
+    SharedPreferences mPref = getSharedPreferences(getString(R.string.sharedpreferences_key), MODE_PRIVATE);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +31,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar actionBar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(actionBar);
+        Context context = getApplicationContext();
+
+        wireWidgets();
+        populateViews();
+        setListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Type listType = new TypeToken<ArrayList<Alarm>>() {}.getType();
+        SharedPreferencesOperator.getListToList(Alarm.alarmList, mPref, "alarm list", listType);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferencesOperator.putList(mPref, "alarm list", Alarm.alarmList);
     }
 
     @Override
@@ -36,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_newalert:
-                Intent makeAlarmIntent = new Intent(MainActivity.this, EditAlarmActivity.class);
+                Intent makeAlarmIntent = new Intent(AlarmViewActivity.this, EditAlarmActivity.class);
                 makeAlarmIntent.putExtra("editalarm", false);
                 startActivity(makeAlarmIntent);
         }
@@ -48,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateViews() {
-        AlarmAdapter alarmListAdapter = new AlarmAdapter(this, alarmList);
+        AlarmAdapter alarmListAdapter = new AlarmAdapter(this, Alarm.alarmList);
         alarmListView.setAdapter(alarmListAdapter);
     }
 
@@ -56,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         alarmListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent editAlarmIntent = new Intent(MainActivity.this, EditAlarmActivity.class);
+                Intent editAlarmIntent = new Intent(AlarmViewActivity.this, EditAlarmActivity.class);
                 editAlarmIntent.putExtra("editalarm", true);
                 editAlarmIntent.putExtra("alarmId", id);
                 startActivity(editAlarmIntent);

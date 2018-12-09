@@ -15,8 +15,6 @@ import java.util.List;
 public class AlarmAdapter extends ArrayAdapter<Alarm> {
     private List<Alarm> data;
     private Context mContext;
-    private DateFormat dateFormat = DateFormat.getDateInstance();
-    private DateFormat timeFormat = DateFormat.getTimeInstance();
 
     public AlarmAdapter(@NonNull Context context, List<Alarm> objects) {
         super(context, R.layout.list_item, objects);
@@ -37,11 +35,11 @@ public class AlarmAdapter extends ArrayAdapter<Alarm> {
         TextView nameView = listItem.findViewById(R.id.textView_listitem_main_name);
         nameView.setText(actedAlarm.getName());
 
-        String eventDate = dateFormat.format(actedAlarm.getEventDate());
+        String eventDate = actedAlarm.getEventDate().toLocalDate().toString();
         TextView dateView = listItem.findViewById(R.id.textView_listitem_main_date);
         dateView.setText(eventDate);
 
-        String eventTime = timeFormat.format(actedAlarm.getEventDate());
+        String eventTime = actedAlarm.getEventDate().toLocalTime().toString();
         TextView timeView = listItem.findViewById(R.id.textView_listitem_main_time);
         timeView.setText(eventTime);
         return listItem;

@@ -1,13 +1,17 @@
 package com.example.advancedalarm;
 
-import java.util.Date;
+import org.threeten.bp.LocalDateTime;
 
-public class Alarm {
+import java.util.ArrayList;
+
+public class Alarm extends Object{
     private String name;
-    private Date eventDate;
+    private LocalDateTime eventDate;
     private Alert alert;
 
-    public Alarm(String name, Date eventDate, Alert alert) {
+    public static ArrayList<Alarm> alarmList = new ArrayList<>();
+
+    public Alarm(String name, LocalDateTime eventDate, Alert alert) {
         this.name = name;
         this.eventDate = eventDate;
         this.alert = alert;
@@ -27,11 +31,11 @@ public class Alarm {
         this.name = name;
     }
 
-    public Date getEventDate() {
+    public LocalDateTime getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(Date eventDate) {
+    public void setEventDate(LocalDateTime eventDate) {
         this.eventDate = eventDate;
     }
 

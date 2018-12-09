@@ -6,4 +6,9 @@
     <string name="editalarm_delete">Delete</string>
     <string name="editalarm_finish">Finish</string>
     <string name="editalarm_dateindicator">Date</string>
+    <string name="editalarm_normalimportance">Normal</string>
+    <string name="editalarm_highimportance">High</string>
+    <string name="AM">AM</string>
+    <string name="PM">PM</string>
+    <string name="sharedpreferences_key">com.example.advancedalerts.afneo234m</string>
 </resources>
