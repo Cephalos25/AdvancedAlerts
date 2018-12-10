@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,15 +16,17 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class AlarmViewActivity extends AppCompatActivity {
+    static final String TAG = "AlarmViewActivity";
     private ListView alarmListView;
 
     private Gson gson = new Gson();
-    SharedPreferences mPref = getSharedPreferences(getString(R.string.sharedpreferences_key), MODE_PRIVATE);
+    SharedPreferences mPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,8 @@ public class AlarmViewActivity extends AppCompatActivity {
         Toolbar actionBar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(actionBar);
         Context context = getApplicationContext();
+        AndroidThreeTen.init(this);
+        mPref = getSharedPreferences(getString(R.string.sharedpreferences_key), MODE_PRIVATE);
 
         wireWidgets();
         populateViews();
@@ -85,6 +90,7 @@ public class AlarmViewActivity extends AppCompatActivity {
                 Intent editAlarmIntent = new Intent(AlarmViewActivity.this, EditAlarmActivity.class);
                 editAlarmIntent.putExtra("editalarm", true);
                 editAlarmIntent.putExtra("alarmId", id);
+                Log.d(TAG, ""+id);
                 startActivity(editAlarmIntent);
             }
         });

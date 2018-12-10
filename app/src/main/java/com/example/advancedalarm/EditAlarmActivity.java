@@ -36,7 +36,7 @@ public class EditAlarmActivity extends AppCompatActivity {
 
     private Button editDescriptionButton;
 
-    private boolean is24HourFormat = DateFormat.is24HourFormat(getApplicationContext());
+    private boolean is24HourFormat;
     private boolean receivedEditIntent;
     private int receivedID;
     Alarm editedAlarm;
@@ -49,10 +49,15 @@ public class EditAlarmActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editalarm);
         Intent receivedIntent = getIntent();
-        receivedEditIntent = receivedIntent.getBooleanExtra("editAlarm", false);
+        receivedEditIntent = receivedIntent.getBooleanExtra("editalarm", false);
         receivedID = receivedIntent.getIntExtra("alarmId", -1);
-        editedAlarm = Alarm.alarmList.get(receivedID);
-        alertDescription = editedAlarm.getAlert().getDescription();
+        if (receivedID != -1){
+            editedAlarm = Alarm.alarmList.get(receivedID); //editedAlarm only exists if the id is not -1.
+            alertDescription = editedAlarm.getAlert().getDescription();
+        } else {
+            alertDescription = null;
+        }
+        is24HourFormat = DateFormat.is24HourFormat(getApplicationContext());
 
         wireWidgets();
         populateViews();
@@ -107,6 +112,8 @@ public class EditAlarmActivity extends AppCompatActivity {
         minutePicker.setMaxValue(59);
         if (!receivedEditIntent){
             deleteView.setVisibility(View.INVISIBLE);
+        } else {
+            deleteView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -147,6 +154,16 @@ public class EditAlarmActivity extends AppCompatActivity {
                 startActivity(cancelEditingIntent);
             }
         });
+        deleteView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent deleteAlarmIntent = new Intent(EditAlarmActivity.this, AlarmViewActivity.class);
+                if (receivedEditIntent){
+                    Alarm.alarmList.remove(receivedID);
+                }
+                startActivity(deleteAlarmIntent);
+            }
+        });
         finishView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -156,7 +173,7 @@ public class EditAlarmActivity extends AppCompatActivity {
                     editedAlarm.setAlert(alarmAlert);
                     LocalDateTime newEventDate = editedAlarm.getEventDate().withMonth(monthPicker.getValue())
                             .withDayOfMonth(dayPicker.getValue()).withYear(yearPicker.getValue())
-                            .withHour(hourPicker.getValue()+12*dayPartPicker.getValue())
+                            .withHour(hourPicker.getValue()%12+12*dayPartPicker.getValue())
                             .withMinute(minutePicker.getValue());
                     editedAlarm.setEventDate(newEventDate);
                     Alarm.alarmList.set(receivedID, editedAlarm);
@@ -165,33 +182,28 @@ public class EditAlarmActivity extends AppCompatActivity {
                     newAlarm.setAlert(alarmAlert);
                     newAlarm.setName(nameInput.getText().toString());
                     LocalDateTime eventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
-                            dayPicker.getValue(), hourPicker.getValue() + 12*dayPartPicker.getValue(),
+                            dayPicker.getValue(), hourPicker.getValue()%12+12*dayPartPicker.getValue(),
                             minutePicker.getValue());
                     newAlarm.setEventDate(eventDate);
                     Alarm.alarmList.add(newAlarm);
                 }
+                startActivity(finishEditingIntent);
             }
         });
-        importanceInteractableView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                importance = !importance;
-                if (importance){
-                    importanceInteractableView.setText(getString(R.string.editalarm_highimportance));
-                } else {
-                    importanceInteractableView.setText(getString(R.string.editalarm_normalimportance));
-                }
+        importanceInteractableView.setOnClickListener(view -> {
+            importance = !importance;
+            if (importance){
+                importanceInteractableView.setText(getString(R.string.editalarm_highimportance));
+            } else {
+                importanceInteractableView.setText(getString(R.string.editalarm_normalimportance));
             }
         });
-        editDescriptionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent editDescriptionIntent = new Intent(EditAlarmActivity.this, EditDescriptionActivity.class);
-                if (receivedEditIntent){
-                    editDescriptionIntent.putExtra("description", editedAlarm.getAlert().getDescription());
-                }
-                startActivityForResult(editDescriptionIntent, DESCRIPTION_REQUEST);
+        editDescriptionButton.setOnClickListener(view -> {
+            Intent editDescriptionIntent = new Intent(EditAlarmActivity.this, EditDescriptionActivity.class);
+            if (receivedEditIntent){
+                editDescriptionIntent.putExtra("description", editedAlarm.getAlert().getDescription());
             }
+            startActivityForResult(editDescriptionIntent, DESCRIPTION_REQUEST);
         });
     }
 
@@ -199,7 +211,7 @@ public class EditAlarmActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == DESCRIPTION_REQUEST){
             if (resultCode == RESULT_OK){
-                String newDescription = null;
+                String newDescription;
                 if (data != null) {
                     newDescription = data.getStringExtra("description");
                     alertDescription = newDescription;
