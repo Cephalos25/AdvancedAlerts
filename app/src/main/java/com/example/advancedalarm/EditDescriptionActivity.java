@@ -38,6 +38,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent goBackIntent = new Intent(EditDescriptionActivity.this, EditAlarmActivity.class);
+                goBackIntent.putExtra("description", description);
                 startActivity(goBackIntent);
             }
         });

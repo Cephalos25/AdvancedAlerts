@@ -14,7 +14,7 @@ import android.widget.TextView;
 import org.threeten.bp.LocalDateTime;
 
 public class EditAlarmActivity extends AppCompatActivity {
-    public static final int DESCRIPTION_REQUEST = 123424;
+    public static final int DESCRIPTION_REQUEST = 12321;
 
     private NumberPicker monthPicker;
     private NumberPicker dayPicker;
@@ -122,6 +122,7 @@ public class EditAlarmActivity extends AppCompatActivity {
         dayPicker.setValue(editedAlarm.getEventDate().getDayOfMonth());
         yearPicker.setValue(editedAlarm.getEventDate().getYear());
         minutePicker.setValue(editedAlarm.getEventDate().getMinute());
+        nameInput.setText(editedAlarm.getName());
         if (is24HourFormat){
             hourPicker.setValue(editedAlarm.getEventDate().getHour());
         } else {
@@ -202,6 +203,15 @@ public class EditAlarmActivity extends AppCompatActivity {
             Intent editDescriptionIntent = new Intent(EditAlarmActivity.this, EditDescriptionActivity.class);
             if (receivedEditIntent){
                 editDescriptionIntent.putExtra("description", editedAlarm.getAlert().getDescription());
+                int hourValue;
+                if (!is24HourFormat){
+                    hourValue = hourPicker.getValue()%12 + dayPartPicker.getValue()*12;
+                } else {
+                    hourValue = hourPicker.getValue();
+                }
+                EditAlarmStorage storage = new EditAlarmStorage(monthPicker.getValue(), dayPicker.getValue(),
+                        yearPicker.getValue(), hourValue, minutePicker.getValue(), importance,
+                        shortDescriptionInput.getText().toString());
             }
             startActivityForResult(editDescriptionIntent, DESCRIPTION_REQUEST);
         });

@@ -89,7 +89,7 @@ public class AlarmViewActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent editAlarmIntent = new Intent(AlarmViewActivity.this, EditAlarmActivity.class);
                 editAlarmIntent.putExtra("editalarm", true);
-                editAlarmIntent.putExtra("alarmId", id);
+                editAlarmIntent.putExtra("alarmId", (int) id);
                 Log.d(TAG, ""+id);
                 startActivity(editAlarmIntent);
             }

@@ -1,6 +1,9 @@
 package com.example.advancedalarm;
 
-public class Alert {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Alert implements Parcelable{
     private String shortDescription;
     private String description;
     private boolean important;
@@ -22,6 +25,36 @@ public class Alert {
         this.description = null;
         this.important = false;
     }
+
+    protected Alert(Parcel in) {
+        shortDescription = in.readString();
+        description = in.readString();
+        important = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(shortDescription);
+        dest.writeString(description);
+        dest.writeByte((byte) (important ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Alert> CREATOR = new Creator<Alert>() {
+        @Override
+        public Alert createFromParcel(Parcel in) {
+            return new Alert(in);
+        }
+
+        @Override
+        public Alert[] newArray(int size) {
+            return new Alert[size];
+        }
+    };
 
     public String getShortDescription() {
         return shortDescription;
