@@ -202,7 +202,7 @@ public class EditAlarmActivity extends AppCompatActivity {
         editDescriptionButton.setOnClickListener(view -> {
             Intent editDescriptionIntent = new Intent(EditAlarmActivity.this, EditDescriptionActivity.class);
             if (receivedEditIntent){
-                editDescriptionIntent.putExtra("description", editedAlarm.getAlert().getDescription());
+                editDescriptionIntent.putExtra("description", alertDescription);
                 int hourValue;
                 if (!is24HourFormat){
                     hourValue = hourPicker.getValue()%12 + dayPartPicker.getValue()*12;
@@ -212,6 +212,7 @@ public class EditAlarmActivity extends AppCompatActivity {
                 EditAlarmStorage storage = new EditAlarmStorage(monthPicker.getValue(), dayPicker.getValue(),
                         yearPicker.getValue(), hourValue, minutePicker.getValue(), importance,
                         shortDescriptionInput.getText().toString());
+                editDescriptionIntent.putExtra("data", storage);
             }
             startActivityForResult(editDescriptionIntent, DESCRIPTION_REQUEST);
         });

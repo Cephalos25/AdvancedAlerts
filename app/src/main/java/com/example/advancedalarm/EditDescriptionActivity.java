@@ -13,12 +13,14 @@ public class EditDescriptionActivity extends AppCompatActivity {
     private EditText editDescription;
 
     private String description;
+    private EditAlarmStorage storage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editdescription);
         Intent receivedIntent = getIntent();
         description = receivedIntent.getStringExtra("description");
+        storage = receivedIntent.getParcelableExtra("data");
 
         wireWidgets();
         if (description != null){

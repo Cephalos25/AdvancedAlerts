@@ -1,8 +1,11 @@
 package com.example.advancedalarm;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -23,6 +26,9 @@ import java.util.ArrayList;
 
 public class AlarmViewActivity extends AppCompatActivity {
     static final String TAG = "AlarmViewActivity";
+    static final String CHANNEL_ONE_ID = "midimportancechannel";
+    static final String CHANNEL_TWO_ID = "highimportancechannel";
+
     private ListView alarmListView;
 
     private Gson gson = new Gson();
@@ -40,6 +46,7 @@ public class AlarmViewActivity extends AppCompatActivity {
 
         wireWidgets();
         populateViews();
+        createNotificationChannels();
         setListeners();
     }
 
@@ -94,5 +101,22 @@ public class AlarmViewActivity extends AppCompatActivity {
                 startActivity(editAlarmIntent);
             }
         });
+    }
+    private void createNotificationChannels(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            String nameOne = "Medium Importance Channel";
+            String descriptionOne = "For the usual notification";
+            int importanceOne = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channelOne = new NotificationChannel(CHANNEL_ONE_ID, nameOne, importanceOne);
+            channelOne.setDescription(descriptionOne);
+            String nameTwo = "High Importance Channel";
+            String descriptionTwo = "For especially important notifications";
+            int importanceTwo = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channelTwo = new NotificationChannel(CHANNEL_TWO_ID, nameTwo, importanceTwo);
+            channelTwo.setDescription(descriptionTwo);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channelOne);
+            notificationManager.createNotificationChannel(channelTwo);
+        }
     }
 }
