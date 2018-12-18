@@ -36,6 +36,7 @@ public class PutNotificationService extends IntentService {
             }
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
             notificationManager.notify(notificationID, notification);
+            Alarm.alarmList.remove(alarm);
         }
     }
 }
