@@ -12,19 +12,17 @@ public class EditDescriptionActivity extends AppCompatActivity {
     private TextView finishView;
     private EditText editDescription;
 
-    private String description;
-    private EditAlarmStorage storage;
+    private Alarm editedAlarm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editdescription);
         Intent receivedIntent = getIntent();
-        description = receivedIntent.getStringExtra("description");
-        storage = receivedIntent.getParcelableExtra("data");
+        editedAlarm = receivedIntent.getParcelableExtra("data");
 
         wireWidgets();
-        if (description != null){
-            editDescription.setText(description);
+        if (editedAlarm != null){
+            editDescription.setText(editedAlarm.getAlert().getDescription());
         }
         setListeners();
     }
@@ -40,7 +38,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent goBackIntent = new Intent(EditDescriptionActivity.this, EditAlarmActivity.class);
-                goBackIntent.putExtra("description", description);
+                goBackIntent.putExtra("alarm", editedAlarm);
                 startActivity(goBackIntent);
             }
         });
@@ -48,8 +46,8 @@ public class EditDescriptionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent changeDescriptionIntent = new Intent(EditDescriptionActivity.this, EditAlarmActivity.class);
-                description = editDescription.getText().toString();
-                changeDescriptionIntent.putExtra("description", description);
+                editedAlarm.getAlert().setDescription(editDescription.getText().toString());
+                changeDescriptionIntent.putExtra("data", editedAlarm);
                 startActivity(changeDescriptionIntent);
             }
         });

@@ -18,6 +18,12 @@
         </activity>
         <activity android:name=".EditAlarmActivity" />
         <activity android:name=".EditDescriptionActivity"></activity>
+
+        <service android:name=".PutNotificationService"
+            android:exported="false"/>
+        <receiver android:name=".PutNotificationReceiver"
+            android:enabled="true"
+            android:exported="false"/>
     </application>
 
 </manifest>

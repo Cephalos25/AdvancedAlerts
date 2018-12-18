@@ -19,7 +19,6 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -41,13 +40,12 @@ public class AlarmViewActivity extends AppCompatActivity {
         Toolbar actionBar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(actionBar);
         Context context = getApplicationContext();
-        AndroidThreeTen.init(this);
         mPref = getSharedPreferences(getString(R.string.sharedpreferences_key), MODE_PRIVATE);
 
         wireWidgets();
-        populateViews();
         createNotificationChannels();
         setListeners();
+        AlarmMaker.eraseAlarms(this, Alarm.alarmList);
     }
 
     @Override
@@ -55,12 +53,15 @@ public class AlarmViewActivity extends AppCompatActivity {
         super.onResume();
         Type listType = new TypeToken<ArrayList<Alarm>>() {}.getType();
         SharedPreferencesOperator.getListToList(Alarm.alarmList, mPref, "alarm list", listType);
+        populateViews();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         SharedPreferencesOperator.putList(mPref, "alarm list", Alarm.alarmList);
+        AlarmMaker.eraseAlarms(this, Alarm.alarmList);
+        AlarmMaker.placeAlarms(this, Alarm.alarmList);
     }
 
     @Override
@@ -96,7 +97,7 @@ public class AlarmViewActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent editAlarmIntent = new Intent(AlarmViewActivity.this, EditAlarmActivity.class);
                 editAlarmIntent.putExtra("editalarm", true);
-                editAlarmIntent.putExtra("alarmId", (int) id);
+                editAlarmIntent.putExtra("alarm", Alarm.alarmList.get((int) id));
                 Log.d(TAG, ""+id);
                 startActivity(editAlarmIntent);
             }

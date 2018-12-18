@@ -1,7 +1,7 @@
 package com.example.advancedalarm;
 
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -11,10 +11,9 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import org.threeten.bp.LocalDateTime;
+import java.time.LocalDateTime;
 
 public class EditAlarmActivity extends AppCompatActivity {
-    public static final int DESCRIPTION_REQUEST = 12321;
 
     private NumberPicker monthPicker;
     private NumberPicker dayPicker;
@@ -38,11 +37,12 @@ public class EditAlarmActivity extends AppCompatActivity {
 
     private boolean is24HourFormat;
     private boolean receivedEditIntent;
-    private int receivedID;
     Alarm editedAlarm;
 
     private boolean importance = false;
     String alertDescription;
+
+    SharedPreferences mPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,21 +50,25 @@ public class EditAlarmActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editalarm);
         Intent receivedIntent = getIntent();
         receivedEditIntent = receivedIntent.getBooleanExtra("editalarm", false);
-        receivedID = receivedIntent.getIntExtra("alarmId", -1);
-        if (receivedID != -1){
-            editedAlarm = Alarm.alarmList.get(receivedID); //editedAlarm only exists if the id is not -1.
-            alertDescription = editedAlarm.getAlert().getDescription();
-        } else {
-            alertDescription = null;
-        }
+        editedAlarm = receivedIntent.getParcelableExtra("alarm");
+
         is24HourFormat = DateFormat.is24HourFormat(getApplicationContext());
+        mPref = getSharedPreferences(getString(R.string.sharedpreferences_key), MODE_PRIVATE);
 
         wireWidgets();
         populateViews();
-        if (receivedID != -1) {
-            populateViewsFromAlarm(receivedID);
+        if (editedAlarm != null) {
+            populateViewsFromAlarm(editedAlarm);
         }
         setListeners();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferencesOperator.putList(mPref, "alarm list", Alarm.alarmList);
+        AlarmMaker.eraseAlarms(this, Alarm.alarmList);
+        AlarmMaker.placeAlarms(this, Alarm.alarmList);
     }
 
     private void wireWidgets() {
@@ -117,28 +121,28 @@ public class EditAlarmActivity extends AppCompatActivity {
         }
     }
 
-    private void populateViewsFromAlarm(int alarmId) {
-        monthPicker.setValue(editedAlarm.getEventDate().getMonthValue());
-        dayPicker.setValue(editedAlarm.getEventDate().getDayOfMonth());
-        yearPicker.setValue(editedAlarm.getEventDate().getYear());
-        minutePicker.setValue(editedAlarm.getEventDate().getMinute());
-        nameInput.setText(editedAlarm.getName());
+    private void populateViewsFromAlarm(Alarm alarm) {
+        monthPicker.setValue(alarm.getEventDate().getMonthValue());
+        dayPicker.setValue(alarm.getEventDate().getDayOfMonth());
+        yearPicker.setValue(alarm.getEventDate().getYear());
+        minutePicker.setValue(alarm.getEventDate().getMinute());
+        nameInput.setText(alarm.getName());
         if (is24HourFormat){
-            hourPicker.setValue(editedAlarm.getEventDate().getHour());
+            hourPicker.setValue(alarm.getEventDate().getHour());
         } else {
             int hour;
-            hour = editedAlarm.getEventDate().getHour()%12;
+            hour = alarm.getEventDate().getHour()%12;
             if (hour == 0){
                 hour = 12;
             }
             hourPicker.setValue(hour);
-            if (editedAlarm.getEventDate().getHour()>12){
+            if (alarm.getEventDate().getHour()>12){
                 dayPartPicker.setValue(1);
             } else {
                 dayPartPicker.setValue(0);
             }
         }
-        if (editedAlarm.getAlert().isImportant()){
+        if (alarm.getAlert().isImportant()){
             importanceInteractableView.setText(getString(R.string.editalarm_highimportance));
             importance = true;
         } else {
@@ -160,7 +164,7 @@ public class EditAlarmActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent deleteAlarmIntent = new Intent(EditAlarmActivity.this, AlarmViewActivity.class);
                 if (receivedEditIntent){
-                    Alarm.alarmList.remove(receivedID);
+                    Alarm.alarmList.remove(editedAlarm);
                 }
                 startActivity(deleteAlarmIntent);
             }
@@ -172,19 +176,30 @@ public class EditAlarmActivity extends AppCompatActivity {
                 Alert alarmAlert = new Alert(shortDescriptionInput.getText().toString(), alertDescription, importance);
                 if (receivedEditIntent){
                     editedAlarm.setAlert(alarmAlert);
-                    LocalDateTime newEventDate = editedAlarm.getEventDate().withMonth(monthPicker.getValue())
-                            .withDayOfMonth(dayPicker.getValue()).withYear(yearPicker.getValue())
-                            .withHour(hourPicker.getValue()%12+12*dayPartPicker.getValue())
-                            .withMinute(minutePicker.getValue());
+                    LocalDateTime newEventDate;
+                    if(is24HourFormat) {
+                        newEventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
+                                dayPicker.getValue(), hourPicker.getValue(), minutePicker.getValue());
+                    } else {
+                        newEventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
+                                dayPicker.getValue(), hourPicker.getValue()%12+12*dayPartPicker.getValue(),
+                                minutePicker.getValue());
+                    }
                     editedAlarm.setEventDate(newEventDate);
-                    Alarm.alarmList.set(receivedID, editedAlarm);
+                    Alarm.alarmList.set(Alarm.alarmList.indexOf(editedAlarm), editedAlarm);
                 } else {
                     Alarm newAlarm = new Alarm();
                     newAlarm.setAlert(alarmAlert);
                     newAlarm.setName(nameInput.getText().toString());
-                    LocalDateTime eventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
-                            dayPicker.getValue(), hourPicker.getValue()%12+12*dayPartPicker.getValue(),
-                            minutePicker.getValue());
+                    LocalDateTime eventDate;
+                    if(is24HourFormat) {
+                        eventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
+                                dayPicker.getValue(), hourPicker.getValue(), minutePicker.getValue());
+                    } else {
+                        eventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
+                                dayPicker.getValue(), hourPicker.getValue()%12+12*dayPartPicker.getValue(),
+                                minutePicker.getValue());
+                    }
                     newAlarm.setEventDate(eventDate);
                     Alarm.alarmList.add(newAlarm);
                 }
@@ -201,33 +216,37 @@ public class EditAlarmActivity extends AppCompatActivity {
         });
         editDescriptionButton.setOnClickListener(view -> {
             Intent editDescriptionIntent = new Intent(EditAlarmActivity.this, EditDescriptionActivity.class);
+            Alert alarmAlert = new Alert(shortDescriptionInput.getText().toString(), alertDescription, importance);
             if (receivedEditIntent){
-                editDescriptionIntent.putExtra("description", alertDescription);
-                int hourValue;
-                if (!is24HourFormat){
-                    hourValue = hourPicker.getValue()%12 + dayPartPicker.getValue()*12;
+                editedAlarm.setAlert(alarmAlert);
+                LocalDateTime newEventDate;
+                if(is24HourFormat) {
+                    newEventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
+                            dayPicker.getValue(), hourPicker.getValue(), minutePicker.getValue());
                 } else {
-                    hourValue = hourPicker.getValue();
+                    newEventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
+                            dayPicker.getValue(), hourPicker.getValue()%12+12*dayPartPicker.getValue(),
+                            minutePicker.getValue());
                 }
-                EditAlarmStorage storage = new EditAlarmStorage(monthPicker.getValue(), dayPicker.getValue(),
-                        yearPicker.getValue(), hourValue, minutePicker.getValue(), importance,
-                        shortDescriptionInput.getText().toString());
-                editDescriptionIntent.putExtra("data", storage);
+                editedAlarm.setEventDate(newEventDate);
+                editDescriptionIntent.putExtra("data", editedAlarm);
+            } else {
+                Alarm newAlarm = new Alarm();
+                newAlarm.setAlert(alarmAlert);
+                newAlarm.setName(nameInput.getText().toString());
+                LocalDateTime eventDate;
+                if(is24HourFormat) {
+                    eventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
+                            dayPicker.getValue(), hourPicker.getValue(), minutePicker.getValue());
+                } else {
+                    eventDate = LocalDateTime.of(yearPicker.getValue(), monthPicker.getValue(),
+                            dayPicker.getValue(), hourPicker.getValue()%12+12*dayPartPicker.getValue(),
+                            minutePicker.getValue());
+                }
+                newAlarm.setEventDate(eventDate);
+                editDescriptionIntent.putExtra("data", newAlarm);
             }
-            startActivityForResult(editDescriptionIntent, DESCRIPTION_REQUEST);
+            startActivity(editDescriptionIntent);
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == DESCRIPTION_REQUEST){
-            if (resultCode == RESULT_OK){
-                String newDescription;
-                if (data != null) {
-                    newDescription = data.getStringExtra("description");
-                    alertDescription = newDescription;
-                }
-            }
-        }
     }
 }
